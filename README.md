@@ -1,11 +1,11 @@
 # LFToolbox -- version 3.3
 
 - [0. Introduction](#0-introduction)
-- [1. Code Environment ](##1. Code Environment )
-- [2. Definitions ](##2. Definitions )
-- [3. Method ](##3. Method )
-- [4. Code ](##4. Code )
-- [5. Log ](##5. Log )
+- [1. Code Environment ](#1-Environment )
+- [2. Definitions ](#2-Definitions )
+- [3. Method ](#3-Method )
+- [4. Code ](#4-Code )
+- [5. Log ](#5-Log )
 
 ------
 
@@ -21,7 +21,7 @@ The goal of this project is to calibrate the light field camera and accurately e
 
 
 
-## 1. Code Environment 
+## 1. Environment 
 
 -   Python 3.12.2
 -   colour-science 0.4.4
