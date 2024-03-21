@@ -13,9 +13,13 @@
 
 A [light field camera](https://en.wikipedia.org/wiki/Light_field_camera) calibration toolbox, for light field 2.0, also known as resolution priority type light field, or focused light field, focused plenoptic camera. Typically, a light field camera consists of an aperture, a camera lens, a micro-lens array (MLA) and a digital image sensor. 
 
-<center><img src='./readme_images/cur_setup.png' height=200><img src='./readme_images/housing_cad.png' height=200></center>
+<p align="center">
+  <img src='./readme_images/cur_setup.png' height=200><img src='./readme_images/housing_cad.png' height=200>
+</p>
 
-<center>Fig. 1. Current Light Field Camera System Setup</center>
+<p align="center">
+  Fig. 1. Current Light Field Camera System Setup
+</p>
 
 The goal of this project is to calibrate the light field camera and accurately estimate the depth of a 3D scene. 
 
