@@ -44,10 +44,13 @@ The goal of this project is to calibrate the light field camera and accurately e
 
 A display panel is used to help with the calibration process. The optical axis is defined by a pinhole on the rail. The origin of the display is the intersection point of the optical axis and the display. Facing the display, the horizontal line from left to right through the display origin is the *x axis*; the vertical line from top to bottom through the display origin is the *y axis*. The optical axis is the *z axis*, and its positive direction is the direction where the camera is facing. The intersection point of optical axis and entrance pupil plane is the origin of the depth. In other words, the entrance pupil is at depth equal to $0mm$. 
 
-<center><img src='./readme_images/display.png' height=200></center>
+<p align="center">
+  <img src='./readme_images/display.png' height=200>
+</p>
 
-<center>Fig. 2. Display Panel</center>
-
+<p align="center">
+  Fig. 1. Fig. 2. Display Panel
+</p>
 
 
 ## 3. Method 
