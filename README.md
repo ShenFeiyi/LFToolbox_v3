@@ -1,6 +1,6 @@
 # LFToolbox -- version 3.3
 
-[toc]
+`<!-- TOC -->`
 
 ------
 
