@@ -1,6 +1,6 @@
 # LFToolbox -- version 3.3
 
-- [0. Introduction ](##0. Introduction )
+- [0. Introduction](#0-introduction)
 - [1. Code Environment ](##1. Code Environment )
 - [2. Definitions ](##2. Definitions )
 - [3. Method ](##3. Method )
