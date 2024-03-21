@@ -1,11 +1,6 @@
 # LFToolbox -- version 3.3
 
-- [0. Introduction](#0-introduction)
-- [1. Code Environment ](#1-Environment )
-- [2. Definitions ](#2-Definitions )
-- [3. Method ](#3-Method )
-- [4. Code ](#4-Code )
-- [5. Log ](#5-Log )
+{:.no_toc}
 
 ------
 
