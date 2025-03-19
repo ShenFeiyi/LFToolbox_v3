@@ -49,12 +49,12 @@ In this setup, the aperture does not need to be optically conjugate to the lensl
 ## 3. Method
 
 0. Alignment 
-    1. Align an aperture with the rail using a laser beam. 
-    2. Assemble the light field camera (LFCam) and try to align it on the rail. 
-    3. Set up the display and try to align it perpendicular to the rail. 
-    4. Align another (conventional) camera with the aperture, use this camera to locate the center pixel of the display. 
+    1. Align an **aperture** with the rail using a laser beam. 
+    2. Assemble the **light field camera** (LFCam) and align it on the rail. 
+    3. Set up the **display** and align it perpendicular to the rail. 
+    4. Align another (conventional) **camera** with the aperture, use this camera to locate the center pixel of the display. 
 1. Before Calibration 
-    1. Put the aperture in front of the LFCam. Adjust the aperture size until each elemental image is not overlapping. Put a white light source in front of the aperture and capture the image. The image doesn't need to be sharp (in focus). The purpose is to locate the center position of each elemental image. 
+    1. Put the aperture in front of the LFCam. Adjust the aperture size until each elemental image is not overlapping (or even smaller). Put a white light source in front of the aperture and capture the image. The image doesn't need to be sharp (in focus), but the shape of the aperture should be seen. The purpose is to locate the center position of each elemental image. 
     2. Open up the aperture and let EIs have slight overlap. Because the MLA is rectangularly arranged while the aperture shape is circular, this helps maximize the effective imaging area on the sensor. For the overlapping images, we can crop it out before further processing. 
     3. (Optional) Put the white light source in front and capture another image as flat image to help remove vignetting. This would be helpful if the system has strong vignetting. 
 2. ST Calibration
@@ -79,10 +79,78 @@ In this setup, the aperture does not need to be optically conjugate to the lensl
 
 ## 5. Code
 
+### Python Code Structure (PyClass)
+
+```mermaid
+flowchart LR
+C0([LFCam])
+
+C0 --> P0(Properties)
+C0 --> F0(Functions)
+
+P0 --> P1(Images)
+P0 --> P2(Calibration params)
+P1 --> P11(3D Scene images) --> P111(random scene, checkerboard, etc)
+P1 --> P12(Calibration images) --> D_{detail below}
+P2 --> P21(intermediate data)
+P2 --> P22(calibrated params)
+
+F0 --> F1[General Functions] --> D_
+
+F0 --> F2([Calibration Functions]) --> D_
+
+F0 --> F3(Depth Estimation Functions)
+F3 --> F31(Compute disparity)
+F3 --> F32(Ray trace) --> F321(Depth map estimation)
+```
+
+-
+
+```mermaid
+flowchart LR
+P12(Calibration images)
+P12 --> P121(Aperture image)
+P12 --> P122(ST sample images)
+P12 --> P123(Obj sample images)
+```
+
+-
+
+```mermaid
+flowchart LR
+F1[General Functions]
+F1 --> F11[Load & Save calibration result] --> F111[images & params]
+F1 --> F12[Detect circle pattern] --> F121[ST & Obj samples]
+F1 --> F13[Segment elemental images]
+F1 --> F14[Distortion Fitting] --> F141[ST & UV]
+F1 --> F15[Sphere Fitting] --> F151[UV field curvature]
+F1 --> F16[Ray bundle waist estimation]
+F16 --> F161[UV center raw data]
+F16 --> F162[depth estimation]
+```
+
+-
+
+```mermaid
+flowchart LR
+
+F2([Calibration Functions])
+F2 --> F21([Build grid model on image sensor plane]) --> F211([segment elemental images])
+F2 --> F22([ST Sasmpling]) --> F221([read and detect ST sample images])
+F2 --> F23([ST Mapping]) --> F231([Fit EI & ST into distortion model])
+F2 --> F24([Object Sampling]) --> F241([read and detect Pbj sample images])
+F2 --> F25([UV Calibration]) --> F251([find UV center according to ray bundle])
+F2 --> F26([UV Fitting]) --> F261([Fit raw UV center data into distortion & field curvature model])
+```
+
 
 
 ## 6. Log
 
-**Version 3.7.0** 
+**Version 3.7.0.1** 
+
+**2025/03/18** Update calibration method. Update Python code structure. 
+
+**Version 3.7.0.0** 
 
 **2025/03/17** Upload `README.md`. Currently cleaning up the code and redoing the calibration. The reason is that a new project came (good excuse) and I have to postpone this project. Now I'm trying to (have to) finish this project as soon as possible. 
