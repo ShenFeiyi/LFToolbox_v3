@@ -79,7 +79,7 @@ In this setup, the aperture does not need to be optically conjugate to the lensl
 
 ## 5. Code
 
-### Python Code Structure (PyClass)
+### (before coding) Python Code Structure (PyClass)
 
 ```mermaid
 flowchart LR
