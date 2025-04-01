@@ -109,9 +109,13 @@ F3 --> F32(Ray trace) --> F321(Depth map estimation)
 ```mermaid
 flowchart LR
 P12(Calibration images)
-P12 --> P121(Aperture image)
-P12 --> P122(ST sample images)
-P12 --> P123(Obj sample images)
+P12 --> P121(LFImage parent class) --> P1211(property)
+P12 --> P122(Aperture image)
+P12 --> P123(ST sample images)
+P12 --> P124(Obj sample images)
+
+P1211 --> P12111(featPoints: set circle detect params before use)
+P1211 --> P12112(EIs: set EI segment params before use)
 ```
 
 -
@@ -148,6 +152,8 @@ F2 --> F26([UV Fitting]) --> F261([Fit raw UV center data into distortion & fiel
 ## 6. Log
 
 **Version 3.7.0.1** 
+
+**2025/03/31** Finish feature point detection in LFImage class. To do: elemental image segmentation. 
 
 **2025/03/18** Update calibration method. Update Python code structure. 
 
