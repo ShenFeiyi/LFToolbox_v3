@@ -11,7 +11,8 @@ class LFCam:
         self.camera_name = kwargs.get('camera_name', 'Light Field Camera')
         self.pixel_size = kwargs.get('pixel_size')
 
-        self.aperture = None # class half_aperture_image
+        self.full_aperture = None # class full_aperture_image
+        self.half_aperture = None # class half_aperture_image
 
         self.ApCenters = None # aperture centers, (#row, #col, 2)
 
@@ -79,22 +80,18 @@ class LFCam:
             import warnings
             warnings.filterwarnings('ignore')
 
-        assert self.aperture is not None, "Aperture image not loaded"
+        assert self.half_aperture is not None, "Aperture image not loaded"
 
         x_index, y_index = 0, 1
         row_index, col_index = 0, 1
 
-        def line(x, k=1, b=0):
-            # assuming no perfect vertical line
-            return k * x + b
-
-        if len(self.aperture.shape) > 2:
+        if len(self.half_aperture.shape) > 2:
             # RGB 2 gray
-            self.aperture = cv.cvtColor(self.aperture, cv.COLOR_RGB2GRAY)
+            self.half_aperture = cv.cvtColor(self.half_aperture, cv.COLOR_RGB2GRAY)
 
         # set circle detection parameters outside before calling
-        # self.aperture.circle_detect_params = {'radius': approxRadius, 'param1': 10, 'param2': 0.95}
-        self.ApCenters = self.aperture.featPoints[:, :, :-1]
+        # self.half_aperture.circle_detect_params = {'radius': approxRadius, 'param1': 10, 'param2': 0.95}
+        self.ApCenters = self.half_aperture.featPoints[:, :, :-1]
         _, self.rotate_matrix = self.reorder_points(self.ApCenters)
 
         return self.rotate_matrix, self.ApCenters

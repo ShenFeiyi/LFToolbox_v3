@@ -79,79 +79,13 @@ In this setup, the aperture does not need to be optically conjugate to the lensl
 
 ## 5. Code
 
-### (before coding) Python Code Structure (PyClass)
-
-```mermaid
-flowchart LR
-C0([LFCam])
-
-C0 --> P0(Properties)
-C0 --> F0(Functions)
-
-P0 --> P1(Images)
-P0 --> P2(Calibration params)
-P1 --> P11(3D Scene images) --> P111(random scene, checkerboard, etc)
-P1 --> P12(Calibration images) --> D_{detail below}
-P2 --> P21(intermediate data)
-P2 --> P22(calibrated params)
-
-F0 --> F1[General Functions] --> D_
-
-F0 --> F2([Calibration Functions]) --> D_
-
-F0 --> F3(Depth Estimation Functions)
-F3 --> F31(Compute disparity)
-F3 --> F32(Ray trace) --> F321(Depth map estimation)
-```
-
--
-
-```mermaid
-flowchart LR
-P12(Calibration images)
-P12 --> P121(LFImage parent class) --> P1211(property)
-P12 --> P122(Aperture image)
-P12 --> P123(ST sample images)
-P12 --> P124(Obj sample images)
-
-P1211 --> P12111(featPoints: set circle detect params before use)
-P1211 --> P12112(EIs: set EI segment params before use)
-```
-
--
-
-```mermaid
-flowchart LR
-F1[General Functions]
-F1 --> F11[Load & Save calibration result] --> F111[images & params]
-F1 --> F12[Detect circle pattern] --> F121[ST & Obj samples]
-F1 --> F13[Segment elemental images]
-F1 --> F14[Distortion Fitting] --> F141[ST & UV]
-F1 --> F15[Sphere Fitting] --> F151[UV field curvature]
-F1 --> F16[Ray bundle waist estimation]
-F16 --> F161[UV center raw data]
-F16 --> F162[depth estimation]
-```
-
--
-
-```mermaid
-flowchart LR
-
-F2([Calibration Functions])
-F2 --> F21([Build grid model on image sensor plane]) --> F211([segment elemental images])
-F2 --> F22([ST Sasmpling]) --> F221([read and detect ST sample images])
-F2 --> F23([ST Mapping]) --> F231([Fit EI & ST into distortion model])
-F2 --> F24([Object Sampling]) --> F241([read and detect Pbj sample images])
-F2 --> F25([UV Calibration]) --> F251([find UV center according to ray bundle])
-F2 --> F26([UV Fitting]) --> F261([Fit raw UV center data into distortion & field curvature model])
-```
-
 
 
 ## 6. Log
 
 **Version 3.7.0.1** 
+
+**2025/04/01** Clear code structures in two mind map files. Next step: elemental image segmentation. 
 
 **2025/03/31** Finish feature point detection in LFImage class. To do: elemental image segmentation. 
 

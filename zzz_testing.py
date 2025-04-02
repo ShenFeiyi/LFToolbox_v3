@@ -3,109 +3,57 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-def reorder_points(points):
-
-
-    x_index, y_index = 0, 1
-
-    row_index, col_index = 0, 1
-
-
-
+def reorder_points(points, grid_rows):
     points = np.array(points, dtype=np.float32)
-
+    
     # PCA using OpenCV to find rotation angle
-
     mean, eigenvectors = cv2.PCACompute(points, mean=None)
-
     angle = np.arctan2(eigenvectors[0, 1], eigenvectors[0, 0])
 
     # Rotate points to align grid
-
     rotation_matrix = np.array([
-
         [np.cos(-angle), -np.sin(-angle)],
-
         [np.sin(-angle),  np.cos(-angle)]
-
     ])
-
     rotated_points = points @ rotation_matrix.T
 
-    # Sort points by Y first (rows), then X (columns)
+    # Cluster points into rows using k-means
+    _, labels, centers = cv2.kmeans(rotated_points[:,1].reshape(-1,1), grid_rows, None,
+                                    criteria=(cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_EPS, 10000, 0.001),
+                                    attempts=10, flags=cv2.KMEANS_PP_CENTERS)
 
-    sorted_idx = np.lexsort((rotated_points[:, x_index], rotated_points[:, y_index]))
+    rows = [[] for _ in range(grid_rows)]
+    for label, point in zip(labels.flatten(), rotated_points):
+        rows[label].append(point)
 
-    sorted_points = rotated_points[sorted_idx]
+    # Sort rows vertically by their mean Y values
+    rows.sort(key=lambda r: np.mean([p[1] for p in r]))
 
-    # Reshape to grid and then sort each row by X
+    # Sort each row horizontally by X
+    sorted_points = []
+    for row in rows:
+        row_sorted = sorted(row, key=lambda p: p[0])
+        sorted_points.extend(row_sorted)
 
-    grid = sorted_points.reshape(grid_shape[0], grid_shape[1], 2)
+    sorted_points = np.array(sorted_points)
 
-    for row in grid:
-
-        row[:] = row[row[:, 0].argsort()]
+    # Shift points to upper left by half grid size
+    grid_center = (np.max(sorted_points, axis=0) + np.min(sorted_points, axis=0)) / 2
+    sorted_points -= grid_center
 
     # Reverse rotation to original orientation
+    reordered_points = sorted_points @ rotation_matrix
 
-    reordered_points = grid.reshape(-1, 2) @ rotation_matrix
-
-
-
-    return reordered_points, rotation_matrix
-
-
-def convert_ApCenters_to_corners(rotate_matrix, ApCenters):
-
-    x_index, y_index = 0, 1
-
-    row_index, col_index = 0, 1
-
-
-    # Convert to corners (upperLeft, upperRight, lowerRight, lowerLeft)
-
-    corners = np.zeros((ApCenters.shape[0], ApCenters.shape[1], 4, 2), dtype=np.float32)
-
-    # size of the grid
-
-    x_size = (ApCenters[:, 1:, x_index] - ApCenters[:, :-1, x_index]).mean()
-
-    y_size = (ApCenters[1:, :, y_index] - ApCenters[:-1, :, y_index]).mean()
-
-    shift = np.ones(ApCenters.shape)
-    shift[:,:,0] = x_size/2
-    shift[:,:,1] = y_size/2
-    # Upper left corner
-
-    corners[:, :, 0, :] = ApCenters - shift
-    return corners
+    return reordered_points
 
 # Example usage
 points = [
-    [0, 0], [1, 1], [3, 2], [2, 2],
-    [1, 0], [2, 0], [3, 0], [0, 1],
-    [2, 1], [3, 1], [0, 2], [1, 2]
+    [4 + np.random.rand(), 4 + np.random.rand()], [1 + np.random.rand(), 1 + np.random.rand()], [2 + np.random.rand(), 2 + np.random.rand()], [3 + np.random.rand(), 3 + np.random.rand()],
+    [4 + np.random.rand(), 1 + np.random.rand()], [1 + np.random.rand(), 4 + np.random.rand()], [2 + np.random.rand(), 3 + np.random.rand()], [3 + np.random.rand(), 2 + np.random.rand()],
+    [3 + np.random.rand(), 1 + np.random.rand()], [2 + np.random.rand(), 4 + np.random.rand()], [1 + np.random.rand(), 3 + np.random.rand()], [4 + np.random.rand(), 2 + np.random.rand()],
+    [5 + np.random.rand(), 5 + np.random.rand()], [5 + np.random.rand(), 2 + np.random.rand()], [5 + np.random.rand(), 3 + np.random.rand()], [5 + np.random.rand(), 1 + np.random.rand()]
 ]
-points = np.array(points) + np.random.rand(12,2)/20
-angle = 25 * (np.pi/180)
-R = np.array([
-    [np.cos(angle), -np.sin(angle)],
-    [np.sin(angle),  np.cos(angle)]
-])
-points = points @ R
 
-grid_shape = [3, 4]
-reordered, rotation_matrix = reorder_points(points)
-print(reordered.reshape(grid_shape+[2]))
-
-for i, p in enumerate(reordered):
-    plt.scatter(p[0], p[1], marker='x')
-    #plt.text(p[0], p[1], str(i), fontsize=22)
-
-corners = reordered @ rotation_matrix
-corners = corners.reshape(-1,2)
-for i, p in enumerate(corners):
-    plt.scatter(p[0], p[1])
-    plt.text(p[0], p[1], str(i), fontsize=22)
-
-plt.show()
+grid_rows = 4
+reordered = reorder_points(points, grid_rows)
+print(reordered)

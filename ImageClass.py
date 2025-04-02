@@ -32,6 +32,12 @@ class LFImage:
             self.elemental_images = self._segment_elemental_images()
         return self.elemental_images
 
+    @property
+    def featPoints(self):
+        if self.feature_points is None:
+            self.feature_points = self._detect_circles()
+        return self.feature_points
+
     def _convert_ApCenters_to_corners(self):
         """convert aperture centers to four corners
         Args:
@@ -62,12 +68,6 @@ class LFImage:
                 points = {'center':p0, 'UL':p_upperLeft, 'UR':p_upperRight, 'LR':p_lowerRight, 'LL':p_lowerLeft}
         """
         pass
-
-    @property
-    def featPoints(self):
-        if self.feature_points is None:
-            self.feature_points = self._detect_circles()
-        return self.feature_points
 
     def _reorder_points(self, points):
         """Rearrange a list of points into a rectangular grid
