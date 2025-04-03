@@ -1,59 +1,36 @@
 # -*- coding:utf-8 -*-
+import os
+import cv2 as cv
 import numpy as np
-import cv2
 from matplotlib import pyplot as plt
 
-def reorder_points(points, grid_rows):
-    points = np.array(points, dtype=np.float32)
-    
-    # PCA using OpenCV to find rotation angle
-    mean, eigenvectors = cv2.PCACompute(points, mean=None)
-    angle = np.arctan2(eigenvectors[0, 1], eigenvectors[0, 0])
+from ImageClass import FullApertureImage, HalfApertureImage
+from LightFieldCamera import LFCam
 
-    # Rotate points to align grid
-    rotation_matrix = np.array([
-        [np.cos(-angle), -np.sin(-angle)],
-        [np.sin(-angle),  np.cos(-angle)]
-    ])
-    rotated_points = points @ rotation_matrix.T
+# root = '/Users/feiyishen/Library/CloudStorage/OneDrive-UniversityofArizona/Feiyi_Images_OneDrive/Feiyi_images'
+# half_aperture_image_filename = str(11402).zfill(6)+'.tiff'
+root = '/Users/feiyishen/Desktop'
+half_aperture_image_filename = str(11402).zfill(6)+'.png'
+scene_filename = str(11779).zfill(6)+'.png'
 
-    # Cluster points into rows using k-means
-    _, labels, centers = cv2.kmeans(rotated_points[:,1].reshape(-1,1), grid_rows, None,
-                                    criteria=(cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_EPS, 10000, 0.001),
-                                    attempts=10, flags=cv2.KMEANS_PP_CENTERS)
+SI = FullApertureImage(os.path.join(root, scene_filename))
+HAI = HalfApertureImage(os.path.join(root, half_aperture_image_filename))
 
-    rows = [[] for _ in range(grid_rows)]
-    for label, point in zip(labels.flatten(), rotated_points):
-        rows[label].append(point)
+cam = LFCam(pixel_size = 3.45e-3, EI_shape = (5, 7))
 
-    # Sort rows vertically by their mean Y values
-    rows.sort(key=lambda r: np.mean([p[1] for p in r]))
+cam.half_aperture = HAI
+cam.half_aperture.circle_detect_params = {
+    'radius': 100, 'param1': 10, 'param2': 0.95
+    }
+cam.build_grid_model()
 
-    # Sort each row horizontally by X
-    sorted_points = []
-    for row in rows:
-        row_sorted = sorted(row, key=lambda p: p[0])
-        sorted_points.extend(row_sorted)
+cam.scene = SI
+cam.scene.EI_segment_params = cam.public_EI_segment_params
+corners = cam.scene._convert_ApCenters_to_corners()
 
-    sorted_points = np.array(sorted_points)
-
-    # Shift points to upper left by half grid size
-    grid_center = (np.max(sorted_points, axis=0) + np.min(sorted_points, axis=0)) / 2
-    sorted_points -= grid_center
-
-    # Reverse rotation to original orientation
-    reordered_points = sorted_points @ rotation_matrix
-
-    return reordered_points
-
-# Example usage
-points = [
-    [4 + np.random.rand(), 4 + np.random.rand()], [1 + np.random.rand(), 1 + np.random.rand()], [2 + np.random.rand(), 2 + np.random.rand()], [3 + np.random.rand(), 3 + np.random.rand()],
-    [4 + np.random.rand(), 1 + np.random.rand()], [1 + np.random.rand(), 4 + np.random.rand()], [2 + np.random.rand(), 3 + np.random.rand()], [3 + np.random.rand(), 2 + np.random.rand()],
-    [3 + np.random.rand(), 1 + np.random.rand()], [2 + np.random.rand(), 4 + np.random.rand()], [1 + np.random.rand(), 3 + np.random.rand()], [4 + np.random.rand(), 2 + np.random.rand()],
-    [5 + np.random.rand(), 5 + np.random.rand()], [5 + np.random.rand(), 2 + np.random.rand()], [5 + np.random.rand(), 3 + np.random.rand()], [5 + np.random.rand(), 1 + np.random.rand()]
-]
-
-grid_rows = 4
-reordered = reorder_points(points, grid_rows)
-print(reordered)
+# plt.imshow(cam.half_aperture.image, cmap='gray')
+plt.imshow(255-cam.scene.image, cmap='gray')
+plt.scatter(cam.ApCenters[:,:,0], cam.ApCenters[:,:,1], color='r')
+for i in range(4):
+    plt.scatter(corners[:,:,i,0], corners[:,:,i,1], marker='x', color=['k', 'c', 'm', 'y'][i])
+plt.show()

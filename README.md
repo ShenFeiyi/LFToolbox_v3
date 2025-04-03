@@ -85,6 +85,8 @@ In this setup, the aperture does not need to be optically conjugate to the lensl
 
 **Version 3.7.0.1** 
 
+**2025/04/02** Update and validate previouly finished functions and methods. Finish `_convert_ApCenters_to_corners`. To do elemental image segmentation. 
+
 **2025/04/01** Clear code structures in two mind map files. Next step: elemental image segmentation. 
 
 **2025/03/31** Finish feature point detection in LFImage class. To do: elemental image segmentation. 
